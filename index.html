@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>huang资源站 - Minecraft资源导航</title>
+<style>
+/* ========== CSS 变量 ========== */
+:root {
+    --mc-green: #4ade80;
+    --mc-green-dark: #22c55e;
+    --mc-green-darker: #16a34a;
+    --mc-green-light: #f0fdf4;
+    --mc-dirt: #8b6f47;
+    --mc-stone: #7d7d7d;
+    --mc-dark: #1a1a2e;
+    --mc-bg: #f8f9fa;
+    --mc-card-bg: #ffffff;
+    --mc-text: #1f2937;
+    --mc-text-light: #6b7280;
+    --mc-border: #e5e7eb;
+    --mc-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    --mc-shadow-hover: 0 8px 30px rgba(0,0,0,0.12);
+    --radius: 12px;
+    --radius-sm: 8px;
+    --font-sans: 'Microsoft YaHei', 'PingFang SC', 'Noto Sans SC', sans-serif;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: var(--font-sans);
+    background: var(--mc-bg);
+    color: var(--mc-text);
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+a { text-decoration: none; color: inherit; }
+
+/* ========== 落地页 ========== */
+#landing-page {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #0f0c29 0%, #1a1a3e 40%, #1e3a2e 100%);
+    overflow: hidden;
+    transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+#landing-page.fade-out {
+    opacity: 0;
+    transform: scale(1.05);
+    pointer-events: none;
+}
+
+.landing-bg {
+    position: absolute;
+    inset: 0;
+    background: url('https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=A%20breathtaking%20Minecraft%20landscape%20at%20sunset%20with%20rolling%20green%20hills%2C%20tall%20oak%20trees%2C%20a%20calm%20blue%20river%2C%20distant%20mountains%2C%20blocky%20clouds%20in%20an%20orange%20and%20purple%20sky%2C%20cinematic%20wide%20angle%20view%2C%20vibrant%20colors%2C%20game%20render%20style&image_size=landscape_16_9') center/cover no-repeat;
+    opacity: 0.45;
+}
+
+.landing-overlay {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%);
+}
+
+.landing-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 0 20px;
+    animation: landingFadeIn 1.2s ease;
+}
+
+@keyframes landingFadeIn {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.landing-badge {
+    display: inline-block;
+    background: rgba(74, 222, 128, 0.2);
+    border: 1px solid rgba(74, 222, 128, 0.5);
+    color: var(--mc-green);
+    padding: 6px 18px;
+    border-radius: 20px;
+    font-size: 14px;
+    margin-bottom: 24px;
+    backdrop-filter: blur(10px);
+}
+
+.landing-title {
+    font-size: clamp(48px, 8vw, 96px);
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 16px;
+    text-shadow: 0 4px 30px rgba(74, 222, 128, 0.4);
+    letter-spacing: 2px;
+}
+
+.landing-title .accent {
+    color: var(--mc-green);
+}
+
+.landing-subtitle {
+    font-size: clamp(16px, 2.5vw, 20px);
+    color: rgba(255,255,255,0.8);
+    margin-bottom: 40px;
+    max-width: 600px;
+}
+
+.landing-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, var(--mc-green), var(--mc-green-dark));
+    color: #fff;
+    font-size: 18px;
+    font-weight: 700;
+    padding: 16px 48px;
+    border-radius: 50px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(74, 222, 128, 0.4);
+}
+
+.landing-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 30px rgba(74, 222, 128, 0.6);
+}
+
+.landing-btn:active {
+    transform: translateY(0);
+}
+
+.landing-btn .arrow {
+    transition: transform 0.3s ease;
+}
+
+.landing-btn:hover .arrow {
+    transform: translateX(5px);
+}
+
+/* 漂浮粒子 */
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--mc-green);
+    border-radius: 2px;
+    opacity: 0.6;
+    animation: floatUp linear infinite;
+}
+
+@keyframes floatUp {
+    0% { transform: translateY(100vh) rotate(0); opacity: 0; }
+    10% { opacity: 0.6; }
+    90% { opacity: 0.4; }
+    100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+}
+
+/* ========== 资源站页面 ========== */
+#resource-page {
+    min-height: 100vh;
+    opacity: 0;
+    transition: opacity 0.8s ease;
+}
+
+#resource-page.show {
+    opacity: 1;
+}
+
+/* 顶部导航栏 */
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--mc-border);
+    padding: 0 32px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+.navbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--mc-dark);
+}
+
+.navbar-logo .logo-icon {
+    width: 36px;
+    height: 36px;
+    background: linear-gradient(135deg, var(--mc-green), var(--mc-green-dark));
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 800;
+}
+
+.navbar-logo .accent {
+    color: var(--mc-green-dark);
+}
+
+.navbar-search {
+    flex: 1;
+    max-width: 400px;
+    position: relative;
+}
+
+.navbar-search input {
+    width: 100%;
+    padding: 9px 16px 9px 40px;
+    border: 1.5px solid var(--mc-border);
+    border-radius: 20px;
+    font-size: 14px;
+    background: var(--mc-bg);
+    outline: none;
+    transition: border-color 0.2s;
+    font-family: var(--font-sans);
+}
+
+.navbar-search input:focus {
+    border-color: var(--mc-green);
+}
+
+.navbar-search .search-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--mc-text-light);
+    font-size: 16px;
+}
+
+.navbar-search .kbd {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    color: var(--mc-text-light);
+    background: #e5e7eb;
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.navbar-links {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    margin-left: auto;
+}
+
+.navbar-links a {
+    font-size: 14px;
+    color: var(--mc-text-light);
+    transition: color 0.2s;
+}
+
+.navbar-links a:hover, .navbar-links a.active {
+    color: var(--mc-green-dark);
+    font-weight: 600;
+}
+
+/* Hero 区域 */
+.hero {
+    position: relative;
+    padding: 48px 32px 40px;
+    text-align: center;
+    overflow: hidden;
+}
+
+.hero-bg {
+    position: absolute;
+    inset: 0;
+    background: url('https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=A%20serene%20Minecraft%20village%20scene%20with%20a%20nether%20portal%2C%20cherry%20blossom%20trees%2C%20a%20small%20cottage%2C%20and%20a%20winding%20path%2C%20soft%20pastel%20colors%2C%20atmospheric%20fog%2C%20game%20render%20style%2C%20wide%20landscape&image_size=landscape_16_9') center/cover no-repeat;
+    opacity: 0.15;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.hero-badge {
+    display: inline-block;
+    background: var(--mc-green-light);
+    border: 1px solid rgba(74, 222, 128, 0.3);
+    color: var(--mc-green-darker);
+    padding: 5px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    margin-bottom: 16px;
+}
+
+.hero-title {
+    font-size: clamp(32px, 5vw, 48px);
+    font-weight: 800;
+    color: var(--mc-dark);
+    margin-bottom: 12px;
+}
+
+.hero-title .accent {
+    color: var(--mc-green-dark);
+}
+
+.hero-desc {
+    font-size: 16px;
+    color: var(--mc-text-light);
+    margin-bottom: 20px;
+}
+
+.hero-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--mc-green-light);
+    border: 1px solid rgba(74, 222, 128, 0.3);
+    color: var(--mc-green-darker);
+    padding: 8px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.hero-cta:hover {
+    background: var(--mc-green);
+    color: #fff;
+}
+
+/* 主体布局 */
+.main-layout {
+    display: flex;
+    gap: 32px;
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 32px 48px;
+}
+
+/* 左侧分类 */
+.sidebar {
+    width: 220px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 80px;
+    align-self: flex-start;
+}
+
+.sidebar-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--mc-text-light);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+    padding-left: 12px;
+}
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 4px;
+    border-left: 3px solid transparent;
+}
+
+.sidebar-item:hover {
+    background: var(--mc-green-light);
+}
+
+.sidebar-item.active {
+    background: var(--mc-green-light);
+    border-left-color: var(--mc-green);
+}
+
+.sidebar-item .num {
+    font-size: 12px;
+    color: var(--mc-text-light);
+    font-weight: 600;
+    min-width: 20px;
+}
+
+.sidebar-item.active .num {
+    color: var(--mc-green-dark);
+}
+
+.sidebar-item .name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--mc-text);
+    flex: 1;
+}
+
+.sidebar-item.active .name {
+    color: var(--mc-green-darker);
+    font-weight: 600;
+}
+
+.sidebar-item .count {
+    font-size: 12px;
+    color: var(--mc-text-light);
+    background: #f3f4f6;
+    padding: 1px 8px;
+    border-radius: 10px;
+}
+
+.sidebar-item.active .count {
+    background: var(--mc-green);
+    color: #fff;
+}
+
+/* 右侧内容 */
+.content-area {
+    flex: 1;
+    min-width: 0;
+}
+
+.section-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.section-header .icon {
+    width: 32px;
+    height: 32px;
+    background: var(--mc-green-light);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+}
+
+.section-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--mc-dark);
+}
+
+.section-header .badge {
+    font-size: 12px;
+    color: var(--mc-text-light);
+    background: #f3f4f6;
+    padding: 2px 10px;
+    border-radius: 10px;
+}
+
+/* 图片卡片网格 */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 48px;
+}
+
+.resource-card {
+    background: var(--mc-card-bg);
+    border: 1px solid var(--mc-border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--mc-shadow);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+}
+
+.resource-card:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--mc-shadow-hover);
+    border-color: var(--mc-green);
+}
+
+.card-img {
+    width: 100%;
+    height: 160px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.resource-card:hover .card-img {
+    transform: scale(1.05);
+}
+
+.card-img-wrapper {
+    width: 100%;
+    height: 160px;
+    overflow: hidden;
+    position: relative;
+}
+
+.card-img-wrapper::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to bottom, transparent 50%, rgba(0,0,0,0.15));
+    pointer-events: none;
+}
+
+.card-body {
+    padding: 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.card-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.card-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+}
+
+.card-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--mc-dark);
+    flex: 1;
+}
+
+.card-tag {
+    font-size: 10px;
+    color: var(--mc-green-darker);
+    background: var(--mc-green-light);
+    padding: 2px 8px;
+    border-radius: 10px;
+    flex-shrink: 0;
+}
+
+.card-desc {
+    font-size: 13px;
+    color: var(--mc-text-light);
+    margin-bottom: 12px;
+    line-height: 1.5;
+    flex: 1;
+}
+
+.card-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--mc-green-dark);
+    font-weight: 600;
+    transition: gap 0.2s;
+}
+
+.resource-card:hover .card-link {
+    gap: 8px;
+}
+
+/* 分类隐藏 */
+.category-section {
+    display: none;
+}
+
+.category-section.active {
+    display: block;
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ========== 好用的MC网站区域 ========== */
+.mc-sites {
+    background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%);
+    padding: 48px 32px;
+    border-top: 1px solid var(--mc-border);
+}
+
+.mc-sites-inner {
+    max-width: 1280px;
+    margin: 0 auto;
+}
+
+.mc-sites-header {
+    text-align: center;
+    margin-bottom: 36px;
+}
+
+.mc-sites-header h2 {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--mc-dark);
+    margin-bottom: 8px;
+}
+
+.mc-sites-header h2 .accent {
+    color: var(--mc-green-dark);
+}
+
+.mc-sites-header p {
+    font-size: 15px;
+    color: var(--mc-text-light);
+}
+
+.mc-sites-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+}
+
+.site-card {
+    background: #fff;
+    border: 1px solid var(--mc-border);
+    border-radius: var(--radius);
+    padding: 20px;
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    box-shadow: var(--mc-shadow);
+}
+
+.site-card:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--mc-shadow-hover);
+    border-color: var(--mc-green);
+}
+
+.site-card .site-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    flex-shrink: 0;
+    color: #fff;
+}
+
+.site-card .site-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.site-card .site-name {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--mc-dark);
+    margin-bottom: 4px;
+}
+
+.site-card .site-desc {
+    font-size: 12px;
+    color: var(--mc-text-light);
+    line-height: 1.5;
+    margin-bottom: 6px;
+}
+
+.site-card .site-url {
+    font-size: 11px;
+    color: var(--mc-green-dark);
+    font-weight: 600;
+}
+
+/* 页脚 */
+.footer {
+    background: var(--mc-dark);
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+    padding: 32px 20px;
+    font-size: 13px;
+}
+
+.footer .footer-logo {
+    color: #fff;
+    font-size: 18px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.footer .footer-logo .accent {
+    color: var(--mc-green);
+}
+
+/* ========== 响应式 ========== */
+@media (max-width: 900px) {
+    .card-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .sidebar {
+        display: none;
+    }
+    
+    .navbar-search {
+        max-width: 200px;
+    }
+    
+    .navbar-links {
+        display: none;
+    }
+}
+
+@media (max-width: 600px) {
+    .card-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .mc-sites-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .navbar {
+        padding: 0 16px;
+    }
+    
+    .hero, .main-layout, .mc-sites {
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+    
+    .navbar-search {
+        display: none;
+    }
+}
+
+/* 回到顶部按钮 */
+.back-to-top {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 44px;
+    height: 44px;
+    background: var(--mc-green);
+    color: #fff;
+    border: none;
+    border-radius: 50%;
+    font-size: 20px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(74, 222, 128, 0.4);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    z-index: 40;
+}
+
+.back-to-top.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+.back-to-top:hover {
+    transform: translateY(-3px);
+    background: var(--mc-green-dark);
+}
+</style>
+</head>
+<body>
+
+<!-- ========== 落地页 ========== -->
+<div id="landing-page">
+    <div class="landing-bg"></div>
+    <div class="landing-overlay"></div>
+    <div id="particles"></div>
+    <div class="landing-content">
+        <div class="landing-badge">Minecraft 中文资源导航 · 精选维护</div>
+        <h1 class="landing-title">huang<span class="accent">资源站</span></h1>
+        <p class="landing-subtitle">精选 Minecraft 生态资源，分类清晰，一键直达。<br>从官方资讯到模组下载，你的我的世界导航站。</p>
+        <button class="landing-btn" onclick="enterSite()">
+            <span>立即前往</span>
+            <span class="arrow">→</span>
+        </button>
+    </div>
+</div>
+
+<!-- ========== 资源站页面 ========== -->
+<div id="resource-page">
+
+<!-- 导航栏 -->
+<nav class="navbar">
+    <div class="navbar-logo">
+        <div class="logo-icon">H</div>
+        <span>huang<span class="accent">资源站</span></span>
+    </div>
+    <div class="navbar-search">
+        <span class="search-icon">🔍</span>
+        <input type="text" placeholder="搜索资源..." id="searchInput">
+        <span class="kbd">Ctrl K</span>
+    </div>
+    <div class="navbar-links">
+        <a href="#" onclick="switchCategory('official')">资源</a>
+        <a href="#mc-sites" onclick="scrollToSites()">推荐网站</a>
+        <a href="#" onclick="goHome()">返回首页</a>
+    </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+        <div class="hero-badge">站长精选 · 持续维护更新</div>
+        <h1 class="hero-title">我的世界 · <span class="accent">资源导航</span></h1>
+        <p class="hero-desc">精选 Minecraft 生态资源，覆盖官方、百科、启动器、模组、工具等分类——点击左侧分类直达。</p>
+        <a class="hero-cta" href="#mc-sites" onclick="scrollToSites()">
+            <span>查看推荐网站</span>
+            <span>↓</span>
+        </a>
+    </div>
+</section>
+
+<!-- 主体布局 -->
+<div class="main-layout">
+    <!-- 侧边栏 -->
+    <aside class="sidebar">
+        <div class="sidebar-title">资源分类</div>
+        <div class="sidebar-item active" onclick="switchCategory('official')">
+            <span class="num">01</span>
+            <span class="name">官方资源</span>
+            <span class="count">6</span>
+        </div>
+        <div class="sidebar-item" onclick="switchCategory('wiki')">
+            <span class="num">02</span>
+            <span class="name">百科 Wiki</span>
+            <span class="count">5</span>
+        </div>
+        <div class="sidebar-item" onclick="switchCategory('launcher')">
+            <span class="num">03</span>
+            <span class="name">启动器</span>
+            <span class="count">6</span>
+        </div>
+        <div class="sidebar-item" onclick="switchCategory('mod')">
+            <span class="num">04</span>
+            <span class="name">模组资源</span>
+            <span class="count">6</span>
+        </div>
+        <div class="sidebar-item" onclick="switchCategory('tool')">
+            <span class="num">05</span>
+            <span class="name">实用工具</span>
+            <span class="count">6</span>
+        </div>
+        <div class="sidebar-item" onclick="switchCategory('community')">
+            <span class="num">06</span>
+            <span class="name">社区论坛</span>
+            <span class="count">5</span>
+        </div>
+    </aside>
+
+    <!-- 内容区 -->
+    <div class="content-area">
+
+        <!-- 官方资源 -->
+        <div class="category-section active" id="cat-official">
+            <div class="section-header">
+                <div class="icon">🏛️</div>
+                <h2>官方资源</h2>
+                <span class="badge">6 个资源</span>
+            </div>
+            <div class="card-grid">
+                <div class="resource-card" onclick="window.open('https://www.minecraft.net','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Minecraft%20official%20website%20hero%20image%20with%20the%20Minecraft%20logo%20on%20a%20green%20grass%20block%20background%2C%20clean%20modern%20design%2C%20bright%20colors%2C%20game%20branding%20style&image_size=landscape_4_3" alt="Minecraft官网">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#44a832">🟩</div>
+                            <span class="card-title">Minecraft 官方网站</span>
+                            <span class="card-tag">官方</span>
+                        </div>
+                        <p class="card-desc">游戏购买、版本下载与官方资讯，我的世界唯一正版来源。</p>
+                        <span class="card-link">minecraft.net →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://mc.163.com','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=NetEase%20Minecraft%20China%20edition%20game%20portal%20with%20colorful%20blocks%20and%20Chinese%20style%20decorations%2C%20modern%20gaming%20website%20design%2C%20vibrant%20and%20friendly&image_size=landscape_4_3" alt="网易我的世界">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#e60012">🐲</div>
+                            <span class="card-title">网易我的世界</span>
+                            <span class="card-tag">官方</span>
+                        </div>
+                        <p class="card-desc">中国大陆地区官方门户与资源平台，含国服组件中心。</p>
+                        <span class="card-link">mc.163.com →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://www.minecraft.net/zh-hans/article','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Minecraft%20news%20and%20updates%20blog%20page%20with%20colorful%20block%20art%20showing%20version%20updates%20and%20patches%2C%20clean%20web%20layout%2C%20gaming%20news%20style&image_size=landscape_4_3" alt="Minecraft新闻">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#f59e0b">📰</div>
+                            <span class="card-title">Minecraft 官方新闻</span>
+                            <span class="card-tag">资讯</span>
+                        </div>
+                        <p class="card-desc">版本更新日志、快照资讯与官方活动公告。</p>
+                        <span class="card-link">minecraft.net/article →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://classic.minecraft.net','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Retro%20Minecraft%20Classic%20from%202009%20with%20blocky%20old-style%20graphics%2C%20simple%20dirt%20and%20stone%20blocks%2C%20nostalgic%20retro%20gaming%20feel%2C%20browser%20game%20style&image_size=landscape_4_3" alt="Minecraft Classic">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#6b7280">🎮</div>
+                            <span class="card-title">Minecraft Classic</span>
+                            <span class="card-tag">免费</span>
+                        </div>
+                        <p class="card-desc">浏览器直接游玩 2009 年初代 Classic 版本，免费免登录。</p>
+                        <span class="card-link">classic.minecraft.net →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://www.minecraft.net/zh-hans/store','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Minecraft%20marketplace%20store%20with%20various%20skins%20texture%20packs%20and%20worlds%20displayed%20on%20colorful%20shelves%2C%20shopping%20interface%2C%20game%20store%20design&image_size=landscape_4_3" alt="Minecraft商店">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#8b5cf6">🛒</div>
+                            <span class="card-title">Minecraft 市场商店</span>
+                            <span class="card-tag">官方</span>
+                        </div>
+                        <p class="card-desc">官方皮肤、材质包、世界地图与 DLC 内容购买中心。</p>
+                        <span class="card-link">minecraft.net/store →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://www.minecraft.net/zh-hans/realms','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Minecraft%20Realms%20private%20server%20with%20a%20beautiful%20blocky%20world%20floating%20in%20clouds%2C%20friends%20gathering%2C%20subscription%20service%20concept%2C%20dreamy%20gaming%20atmosphere&image_size=landscape_4_3" alt="Minecraft Realms">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#3b82f6">☁️</div>
+                            <span class="card-title">Minecraft Realms</span>
+                            <span class="card-tag">订阅</span>
+                        </div>
+                        <p class="card-desc">官方私人服务器，和朋友一起随时随地联机游玩。</p>
+                        <span class="card-link">minecraft.net/realms →</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 百科 Wiki -->
+        <div class="category-section" id="cat-wiki">
+            <div class="section-header">
+                <div class="icon">📚</div>
+                <h2>百科 Wiki</h2>
+                <span class="badge">5 个资源</span>
+            </div>
+            <div class="card-grid">
+                <div class="resource-card" onclick="window.open('https://zh.minecraft.wiki','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Minecraft%20wiki%20encyclopedia%20page%20with%20bookshelf%20background%2C%20open%20book%20with%20Minecraft%20item%20icons%20and%20descriptions%2C%20knowledge%20and%20information%20concept%2C%20clean%20wiki%20layout&image_size=landscape_4_3" alt="中文MCWiki">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#0ea5e9">📖</div>
+                            <span class="card-title">中文 Minecraft Wiki</span>
+                            <span class="card-tag">百科</span>
+                        </div>
+                        <p class="card-desc">最全面的中文 Minecraft 百科全书，涵盖方块、物品、生物等所有内容。</p>
+                        <span class="card-link">zh.minecraft.wiki →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://minecraft.wiki','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=English%20Minecraft%20Wiki%20page%20with%20detailed%20block%20and%20item%20articles%2C%20encyclopedia%20style%20layout%2C%20game%20knowledge%20database%2C%20clean%20modern%20design&image_size=landscape_4_3" alt="English MCWiki">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#6366f1">📕</div>
+                            <span class="card-title">Minecraft Wiki (EN)</span>
+                            <span class="card-tag">百科</span>
+                        </div>
+                        <p class="card-desc">英文原版 Minecraft Wiki，内容最全最新的百科资料库。</p>
+                        <span class="card-link">minecraft.wiki →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://www.mcmod.cn','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Chinese%20Minecraft%20mod%20encyclopedia%20website%20with%20various%20mod%20item%20icons%20organized%20in%20a%20grid%2C%20mod%20showcase%20gallery%2C%20colorful%20and%20informative%2C%20wiki%20style&image_size=landscape_4_3" alt="MCMod">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#f97316">🔧</div>
+                            <span class="card-title">MCMod 模组百科</span>
+                            <span class="card-tag">模组</span>
+                        </div>
+                        <p class="card-desc">国内最大的 Minecraft 模组中文百科，收录上千款模组详细资料。</p>
+                        <span class="card-link">mcmod.cn →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://minecraft.wiki/w/Minecraft_Wiki:Projects/Structure_Block','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Minecraft%20redstone%20circuits%20and%20mechanisms%20diagram%20with%20wiring%2C%20pistons%2C%20repeaters%2C%20and%20logic%20gates%2C%20technical%20guide%20style%2C%20blueprint%20layout&image_size=landscape_4_3" alt="红石百科">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#ef4444">⚡</div>
+                            <span class="card-title">红石机械百科</span>
+                            <span class="card-tag">红石</span>
+                        </div>
+                        <p class="card-desc">红石电路、机械装置原理与设计方案的详细百科资料。</p>
+                        <span class="card-link">minecraft.wiki/redstone →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://minecraft.wiki/w/Commands','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Minecraft%20command%20block%20and%20console%20commands%20with%20code-like%20text%20displayed%2C%20terminal%20style%20interface%2C%20cheat%20sheet%20layout%2C%20dark%20technical%20theme&image_size=landscape_4_3" alt="命令百科">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#10b981">⌨️</div>
+                            <span class="card-title">指令命令大全</span>
+                            <span class="card-tag">指令</span>
+                        </div>
+                        <p class="card-desc">全部原版指令语法、参数与用法详解，命令方块必备参考。</p>
+                        <span class="card-link">minecraft.wiki/commands →</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 启动器 -->
+        <div class="category-section" id="cat-launcher">
+            <div class="section-header">
+                <div class="icon">🚀</div>
+                <h2>启动器</h2>
+                <span class="badge">6 个资源</span>
+            </div>
+            <div class="card-grid">
+                <div class="resource-card" onclick="window.open('https://hmcl.huangyuhui.net','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=HMCL%20Minecraft%20launcher%20interface%20with%20clean%20modern%20UI%2C%20version%20list%2C%20download%20progress%20bars%2C%20Java%20edition%20launcher%2C%20software%20screenshot%20style&image_size=landscape_4_3" alt="HMCL">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#8b5cf6">⚡</div>
+                            <span class="card-title">HMCL 启动器</span>
+                            <span class="card-tag">开源</span>
+                        </div>
+                        <p class="card-desc">开源跨平台 Minecraft 启动器，支持正版/离线、自动安装 Java 与依赖。</p>
+                        <span class="card-link">hmcl.huangyuhui.net →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://pcl2.pvptm.com','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Plain%20Craft%20Launcher%202%20PCL2%20Minecraft%20launcher%20with%20colorful%20UI%20cards%2C%20version%20selection%20screen%2C%20download%20manager%2C%20Chinese%20software%20interface%2C%20modern%20desktop%20app&image_size=landscape_4_3" alt="PCL2">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#f59e0b">🎯</div>
+                            <span class="card-title">PCL2 启动器</span>
+                            <span class="card-tag">免费</span>
+                        </div>
+                        <p class="card-desc">Plain Craft Launcher 2，界面美观功能强大，深受国内玩家喜爱。</p>
+                        <span class="card-link">pcl2.pvptm.com →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://github.com/FCL-Team/FoldCraftLauncher','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Fold%20Craft%20Launcher%20FCL%20Minecraft%20launcher%20with%20modular%20interface%2C%20dark%20mode%20design%2C%20version%20manager%2C%20Java%20edition%2C%20software%20UI%20screenshot&image_size=landscape_4_3" alt="FCL">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#6b7280">📦</div>
+                            <span class="card-title">FCL 启动器</span>
+                            <span class="card-tag">开源</span>
+                        </div>
+                        <p class="card-desc">Fold Craft Launcher，基于 PCL2 社区维护的开源分支，功能丰富。</p>
+                        <span class="card-link">github.com/FCL-Team →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://www.minecraft.net/zh-hans/download','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Minecraft%20official%20launcher%20download%20page%20with%20green%20download%20button%2C%20Minecraft%20logo%2C%20official%20branding%2C%20clean%20download%20interface%2C%20official%20software%20style&image_size=landscape_4_3" alt="官方启动器">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#44a832">🟩</div>
+                            <span class="card-title">官方启动器</span>
+                            <span class="card-tag">官方</span>
+                        </div>
+                        <p class="card-desc">Mojang 官方启动器，正版用户首选，自动更新游戏版本。</p>
+                        <span class="card-link">minecraft.net/download →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://atlauncher.com','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=ATLauncher%20modpack%20launcher%20interface%20with%20list%20of%20modpacks%2C%20install%20buttons%2C%20modern%20clean%20UI%2C%20software%20screenshot%2C%20gaming%20launcher%20design&image_size=landscape_4_3" alt="ATLauncher">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#3b82f6">🔌</div>
+                            <span class="card-title">ATLauncher</span>
+                            <span class="card-tag">整合包</span>
+                        </div>
+                        <p class="card-desc">专注于模组整合包的启动器，一键安装各类整合包，方便快捷。</p>
+                        <span class="card-link">atlauncher.com →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://multimc.org','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=MultiMC%20launcher%20interface%20with%20multiple%20Minecraft%20instances%20listed%2C%20instance%20manager%2C%20clean%20minimalist%20UI%2C%20desktop%20software%20screenshot%2C%20technical%20design&image_size=landscape_4_3" alt="MultiMC">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#7c3aed">🖥️</div>
+                            <span class="card-title">MultiMC</span>
+                            <span class="card-tag">开源</span>
+                        </div>
+                        <p class="card-desc">多实例管理启动器，支持同时管理多个独立游戏环境。</p>
+                        <span class="card-link">multimc.org →</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 模组资源 -->
+        <div class="category-section" id="cat-mod">
+            <div class="section-header">
+                <div class="icon">🧩</div>
+                <h2>模组资源</h2>
+                <span class="badge">6 个资源</span>
+            </div>
+            <div class="card-grid">
+                <div class="resource-card" onclick="window.open('https://www.curseforge.com/minecraft','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=CurseForge%20Minecraft%20mods%20page%20with%20grid%20of%20mod%20thumbnails%2C%20download%20buttons%2C%20search%20bar%2C%20mod%20marketplace%2C%20gaming%20content%20platform%2C%20modern%20web%20design&image_size=landscape_4_3" alt="CurseForge">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#f97316">🧩</div>
+                            <span class="card-title">CurseForge</span>
+                            <span class="card-tag">模组</span>
+                        </div>
+                        <p class="card-desc">全球最大的 Minecraft 模组与整合包下载平台，海量资源。</p>
+                        <span class="card-link">curseforge.com →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://modrinth.com','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Modrinth%20mod%20platform%20with%20clean%20modern%20dark%20theme%2C%20mod%20cards%20grid%2C%20open%20source%20badge%2C%20developer-friendly%20interface%2C%20gaming%20mods%20marketplace&image_size=landscape_4_3" alt="Modrinth">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#10b981">🌿</div>
+                            <span class="card-title">Modrinth</span>
+                            <span class="card-tag">开源</span>
+                        </div>
+                        <p class="card-desc">开源新兴模组平台，界面简洁速度快，支持 Fabric/Forge/Quilt。</p>
+                        <span class="card-link">modrinth.com →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://www.planetminecraft.com','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Planet%20Minecraft%20community%20with%20colorful%20builds%20skins%20and%20maps%20showcase%2C%20creative%20content%20gallery%2C%20community%20sharing%20platform%2C%20vibrant%20and%20lively%20design&image_size=landscape_4_3" alt="PlanetMC">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#8b5cf6">🌍</div>
+                            <span class="card-title">Planet Minecraft</span>
+                            <span class="card-tag">社区</span>
+                        </div>
+                        <p class="card-desc">老牌 Minecraft 社区，模组、皮肤、地图、材质包一站式分享。</p>
+                        <span class="card-link">planetminecraft.com →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://modrinth.com/mod/fabric-api','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Fabric%20mod%20loader%20logo%20with%20colorful%20yarn%20and%20thread%20theme%2C%20API%20concept%2C%20developer%20tools%2C%20clean%20modern%20tech%20design%2C%20mod%20framework%20style&image_size=landscape_4_3" alt="Fabric">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#e2e8f0">🧵</div>
+                            <span class="card-title">Fabric API</span>
+                            <span class="card-tag">前置</span>
+                        </div>
+                        <p class="card-desc">轻量级模组加载框架，更新快、性能好，适配最新版本迅速。</p>
+                        <span class="card-link">modrinth.com/fabric-api →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://files.minecraftforge.net','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Minecraft%20Forge%20anvil%20logo%20with%20mod%20loading%20concept%2C%20classic%20modding%20platform%2C%20anvil%20and%20hammer%20theme%2C%20developer%20tools%2C%20traditional%20gaming%20mod%20framework&image_size=landscape_4_3" alt="Forge">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#92400e">🔨</div>
+                            <span class="card-title">Minecraft Forge</span>
+                            <span class="card-tag">前置</span>
+                        </div>
+                        <p class="card-desc">最经典的模组加载器，生态庞大，兼容大量优质模组。</p>
+                        <span class="card-link">files.minecraftforge.net →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://modrinth.com/mod/sodium','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Minecraft%20Sodium%20performance%20mod%20with%20speed%20and%20lightning%20theme%2C%20FPS%20boost%20concept%2C%20blue%20sodium%20crystal%2C%20optimization%20and%20performance%2C%20clean%20tech%20design&image_size=landscape_4_3" alt="Sodium">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#3b82f6">⚡</div>
+                            <span class="card-title">Sodium 渲染优化</span>
+                            <span class="card-tag">优化</span>
+                        </div>
+                        <p class="card-desc">Fabric 平台最知名的渲染优化模组，大幅提升游戏帧率。</p>
+                        <span class="card-link">modrinth.com/sodium →</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 实用工具 -->
+        <div class="category-section" id="cat-tool">
+            <div class="section-header">
+                <div class="icon">🛠️</div>
+                <h2>实用工具</h2>
+                <span class="badge">6 个资源</span>
+            </div>
+            <div class="card-grid">
+                <div class="resource-card" onclick="window.open('https://mcstacker.net','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Minecraft%20command%20generator%20tool%20interface%20with%20code%20output%2C%20item%20customizer%2C%20NBT%20tag%20editor%2C%20technical%20tool%20UI%2C%20dark%20mode%20developer%20design&image_size=landscape_4_3" alt="MCStacker">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#8b5cf6">⚙️</div>
+                            <span class="card-title">MCStacker</span>
+                            <span class="card-tag">工具</span>
+                        </div>
+                        <p class="card-desc">强大的指令生成器，支持复杂 NBT 数据、附魔、属性等自定义。</p>
+                        <span class="card-link">mcstacker.net →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://misode.github.io','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Minecraft%20data%20pack%20generator%20with%20JSON%20files%2C%20loot%20tables%2C%20predicates%2C%20advancement%20builder%2C%20code%20editor%20interface%2C%20developer%20tool%2C%20clean%20dark%20theme&image_size=landscape_4_3" alt="Misode">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#10b981">📊</div>
+                            <span class="card-title">Misode 数据包生成器</span>
+                            <span class="card-tag">工具</span>
+                        </div>
+                        <p class="card-desc">可视化生成数据包文件，战利品表、进度、谓词等一键导出。</p>
+                        <span class="card-link">misode.github.io →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://crafted.teddyrendite.fr','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Minecraft%20crafting%20recipe%20calculator%20with%20grid%20of%20items%2C%20recipe%20viewer%2C%20crafting%20table%20interface%2C%20clean%20utility%20tool%2C%20modern%20web%20app%20design&image_size=landscape_4_3" alt="合成表">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#f59e0b">📋</div>
+                            <span class="card-title">合成表查询器</span>
+                            <span class="card-tag">工具</span>
+                        </div>
+                        <p class="card-desc">在线查询所有物品合成配方，支持模组合成表搜索。</p>
+                        <span class="card-link">crafted.teddyrendite.fr →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://mc.cloudtilt.io','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Minecraft%20structure%20block%20and%20schematic%20viewer%20with%203D%20block%20preview%2C%20building%20planner%2C%20architecture%20tool%2C%20isometric%20view%2C%20clean%20technical%20interface&image_size=landscape_4_3" alt="建筑工具">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#3b82f6">📐</div>
+                            <span class="card-title">3D 结构查看器</span>
+                            <span class="card-tag">工具</span>
+                        </div>
+                        <p class="card-desc">在线查看和导入 NBT 结构文件，3D 预览建筑蓝图。</p>
+                        <span class="card-link">mc.cloudtilt.io →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://chunkbase.com','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Minecraft%20seed%20map%20and%20biome%20finder%20with%20colorful%20world%20map%2C%20structure%20locator%2C%20coordinates%20overlay%2C%20cartography%20tool%2C%20clean%20map%20interface&image_size=landscape_4_3" alt="Chunkbase">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#059669">🗺️</div>
+                            <span class="card-title">Chunkbase 种子地图</span>
+                            <span class="card-tag">工具</span>
+                        </div>
+                        <p class="card-desc">输入种子查看世界地图，定位村庄、神殿、要塞等结构坐标。</p>
+                        <span class="card-link">chunkbase.com →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://mineskin.org','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Minecraft%20skin%20viewer%20and%20gallery%20with%20character%20models%2C%20skin%20editor%2C%20colorful%20pixel%20art%20portraits%2C%20avatar%20customization%2C%20clean%20modern%20interface&image_size=landscape_4_3" alt="皮肤">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#ec4899">👤</div>
+                            <span class="card-title">MineSkin 皮肤库</span>
+                            <span class="card-tag">皮肤</span>
+                        </div>
+                        <p class="card-desc">海量 Minecraft 皮肤下载与预览，支持 3D 模型实时渲染。</p>
+                        <span class="card-link">mineskin.org →</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 社区论坛 -->
+        <div class="category-section" id="cat-community">
+            <div class="section-header">
+                <div class="icon">💬</div>
+                <h2>社区论坛</h2>
+                <span class="badge">5 个资源</span>
+            </div>
+            <div class="card-grid">
+                <div class="resource-card" onclick="window.open('https://www.mcbbs.net','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Minecraft%20community%20forum%20website%20with%20thread%20list%2C%20discussion%20categories%2C%20user%20avatars%2C%20post%20replies%2C%20Chinese%20forum%20interface%2C%20lively%20community%20atmosphere&image_size=landscape_4_3" alt="MCBBS">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#3b82f6">💬</div>
+                            <span class="card-title">MCBBS 论坛</span>
+                            <span class="card-tag">论坛</span>
+                        </div>
+                        <p class="card-desc">国内最大的 Minecraft 中文论坛，资源分享与交流社区。</p>
+                        <span class="card-link">mcbbs.net →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://www.reddit.com/r/Minecraft','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Reddit%20Minecraft%20subreddit%20page%20with%20post%20feed%2C%20upvotes%2C%20discussion%20threads%2C%20community%20sharing%2C%20social%20media%20interface%2C%20clean%20modern%20design&image_size=landscape_4_3" alt="Reddit">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#ff4500">🔥</div>
+                            <span class="card-title">Reddit r/Minecraft</span>
+                            <span class="card-tag">社区</span>
+                        </div>
+                        <p class="card-desc">全球最活跃的 Minecraft 英文社区，分享作品与讨论资讯。</p>
+                        <span class="card-link">reddit.com/r/Minecraft →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://www.minecraftforum.net','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Minecraft%20Forum%20community%20website%20with%20discussion%20threads%2C%20mod%20showcase%2C%20server%20ads%2C%20classic%20forum%20layout%2C%20gaming%20community%2C%20traditional%20web%20forum%20design&image_size=landscape_4_3" alt="MCForum">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#8b5cf6">🏛️</div>
+                            <span class="card-title">Minecraft Forum</span>
+                            <span class="card-tag">论坛</span>
+                        </div>
+                        <p class="card-desc">老牌 Minecraft 英文论坛，模组发布与服务器宣传聚集地。</p>
+                        <span class="card-link">minecraftforum.net →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://discord.com/invite/minecraft','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Discord%20server%20chat%20interface%20with%20Minecraft%20theme%2C%20text%20channels%2C%20voice%20channels%2C%20online%20users%2C%20gaming%20community%2C%20modern%20chat%20app%20design%2C%20dark%20mode&image_size=landscape_4_3" alt="Discord">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#5865f2">🎧</div>
+                            <span class="card-title">Minecraft Discord</span>
+                            <span class="card-tag">即时通讯</span>
+                        </div>
+                        <p class="card-desc">官方 Discord 社区，与全球玩家实时聊天、组队联机。</p>
+                        <span class="card-link">discord.com/minecraft →</span>
+                    </div>
+                </div>
+                <div class="resource-card" onclick="window.open('https://www.bilibili.com/v/game/Minecraft','_blank')">
+                    <div class="card-img-wrapper">
+                        <img class="card-img" src="https://trae-api-cn.mchost.guru/api/ide/v1/text_to_image?prompt=Bilibili%20Minecraft%20video%20page%20with%20video%20thumbnails%2C%20play%20counts%2C%20danmaku%20comments%2C%20content%20creator%20gallery%2C%20Chinese%20video%20platform%2C%20modern%20media%20design&image_size=landscape_4_3" alt="B站MC">
+                    </div>
+                    <div class="card-body">
+                        <div class="card-title-row">
+                            <div class="card-icon" style="background:#fb7299">📺</div>
+                            <span class="card-title">哔哩哔哩 MC 区</span>
+                            <span class="card-tag">视频</span>
+                        </div>
+                        <p class="card-desc">B 站我的世界视频专区，实况、教程、红石与建筑作品聚集。</p>
+                        <span class="card-link">bilibili.com/game/MC →</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- ========== 好用的我的世界网站 ========== -->
+<section class="mc-sites" id="mc-sites">
+    <div class="mc-sites-inner">
+        <div class="mc-sites-header">
+            <h2>好用的<span class="accent">我的世界</span>网站</h2>
+            <p>精选常用 Minecraft 网站，收藏即用，随取随查</p>
+        </div>
+        <div class="mc-sites-grid">
+            <div class="site-card" onclick="window.open('https://www.minecraft.net','_blank')">
+                <div class="site-icon" style="background:linear-gradient(135deg,#44a832,#2d7a1f)">🟩</div>
+                <div class="site-info">
+                    <div class="site-name">Minecraft 官网</div>
+                    <div class="site-desc">游戏购买、版本下载、官方资讯与商店</div>
+                    <div class="site-url">minecraft.net</div>
+                </div>
+            </div>
+            <div class="site-card" onclick="window.open('https://zh.minecraft.wiki','_blank')">
+                <div class="site-icon" style="background:linear-gradient(135deg,#0ea5e9,#0284c7)">📖</div>
+                <div class="site-info">
+                    <div class="site-name">中文 Minecraft Wiki</div>
+                    <div class="site-desc">最全面的中文百科，查方块、物品、生物资料</div>
+                    <div class="site-url">zh.minecraft.wiki</div>
+                </div>
+            </div>
+            <div class="site-card" onclick="window.open('https://www.mcmod.cn','_blank')">
+                <div class="site-icon" style="background:linear-gradient(135deg,#f97316,#ea580c)">🔧</div>
+                <div class="site-info">
+                    <div class="site-name">MCMod 模组百科</div>
+                    <div class="site-desc">国内最大模组中文百科，上千款模组详解</div>
+                    <div class="site-url">mcmod.cn</div>
+                </div>
+            </div>
+            <div class="site-card" onclick="window.open('https://www.curseforge.com/minecraft','_blank')">
+                <div class="site-icon" style="background:linear-gradient(135deg,#f97316,#c2410c)">🧩</div>
+                <div class="site-info">
+                    <div class="site-name">CurseForge</div>
+                    <div class="site-desc">全球最大模组与整合包下载平台</div>
+                    <div class="site-url">curseforge.com</div>
+                </div>
+            </div>
+            <div class="site-card" onclick="window.open('https://modrinth.com','_blank')">
+                <div class="site-icon" style="background:linear-gradient(135deg,#10b981,#059669)">🌿</div>
+                <div class="site-info">
+                    <div class="site-name">Modrinth</div>
+                    <div class="site-desc">开源新兴模组平台，速度快界面简洁</div>
+                    <div class="site-url">modrinth.com</div>
+                </div>
+            </div>
+            <div class="site-card" onclick="window.open('https://hmcl.huangyuhui.net','_blank')">
+                <div class="site-icon" style="background:linear-gradient(135deg,#8b5cf6,#7c3aed)">⚡</div>
+                <div class="site-info">
+                    <div class="site-name">HMCL 启动器</div>
+                    <div class="site-desc">开源跨平台启动器，自动安装 Java</div>
+                    <div class="site-url">hmcl.huangyuhui.net</div>
+                </div>
+            </div>
+            <div class="site-card" onclick="window.open('https://chunkbase.com','_blank')">
+                <div class="site-icon" style="background:linear-gradient(135deg,#059669,#047857)">🗺️</div>
+                <div class="site-info">
+                    <div class="site-name">Chunkbase</div>
+                    <div class="site-desc">种子地图工具，定位村庄神殿要塞</div>
+                    <div class="site-url">chunkbase.com</div>
+                </div>
+            </div>
+            <div class="site-card" onclick="window.open('https://www.planetminecraft.com','_blank')">
+                <div class="site-icon" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">🌍</div>
+                <div class="site-info">
+                    <div class="site-name">Planet Minecraft</div>
+                    <div class="site-desc">老牌社区，皮肤地图材质包分享</div>
+                    <div class="site-url">planetminecraft.com</div>
+                </div>
+            </div>
+            <div class="site-card" onclick="window.open('https://mcstacker.net','_blank')">
+                <div class="site-icon" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9)">⚙️</div>
+                <div class="site-info">
+                    <div class="site-name">MCStacker</div>
+                    <div class="site-desc">强大的指令生成器，复杂 NBT 自定义</div>
+                    <div class="site-url">mcstacker.net</div>
+                </div>
+            </div>
+            <div class="site-card" onclick="window.open('https://mineskin.org','_blank')">
+                <div class="site-icon" style="background:linear-gradient(135deg,#ec4899,#db2777)">👤</div>
+                <div class="site-info">
+                    <div class="site-name">MineSkin</div>
+                    <div class="site-desc">海量皮肤下载与 3D 预览</div>
+                    <div class="site-url">mineskin.org</div>
+                </div>
+            </div>
+            <div class="site-card" onclick="window.open('https://www.bilibili.com/v/game/Minecraft','_blank')">
+                <div class="site-icon" style="background:linear-gradient(135deg,#fb7299,#e6006e)">📺</div>
+                <div class="site-info">
+                    <div class="site-name">哔哩哔哩 MC 区</div>
+                    <div class="site-desc">实况教程红石建筑视频聚集地</div>
+                    <div class="site-url">bilibili.com</div>
+                </div>
+            </div>
+            <div class="site-card" onclick="window.open('https://www.mcbbs.net','_blank')">
+                <div class="site-icon" style="background:linear-gradient(135deg,#3b82f6,#2563eb)">💬</div>
+                <div class="site-info">
+                    <div class="site-name">MCBBS 论坛</div>
+                    <div class="site-desc">国内最大中文 Minecraft 论坛社区</div>
+                    <div class="site-url">mcbbs.net</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 页脚 -->
+<footer class="footer">
+    <div class="footer-logo">huang<span class="accent">资源站</span></div>
+    <p>精选 Minecraft 生态资源导航 · 持续维护更新</p>
+    <p style="margin-top:8px;opacity:0.5;">© 2026 huang资源站 · 本站仅做资源导航，不存储任何资源文件</p>
+</footer>
+
+</div>
+
+<!-- 回到顶部 -->
+<button class="back-to-top" onclick="scrollToTop()" id="backToTop">↑</button>
+
+<script>
+// 进入资源站
+function enterSite() {
+    document.getElementById('landing-page').classList.add('fade-out');
+    setTimeout(() => {
+        document.getElementById('landing-page').style.display = 'none';
+        document.getElementById('resource-page').classList.add('show');
+        document.body.style.overflow = 'auto';
+    }, 800);
+}
+
+// 返回首页
+function goHome() {
+    document.getElementById('resource-page').classList.remove('show');
+    document.getElementById('landing-page').style.display = 'flex';
+    document.getElementById('landing-page').classList.remove('fade-out');
+    document.body.style.overflow = 'hidden';
+    window.scrollTo(0, 0);
+}
+
+// 切换分类
+function switchCategory(cat) {
+    document.querySelectorAll('.sidebar-item').forEach(item => item.classList.remove('active'));
+    document.querySelectorAll('.category-section').forEach(section => section.classList.remove('active'));
+    
+    const items = document.querySelectorAll('.sidebar-item');
+    const catMap = {'official':0,'wiki':1,'launcher':2,'mod':3,'tool':4,'community':5};
+    if (items[catMap[cat]]) items[catMap[cat]].classList.add('active');
+    
+    const section = document.getElementById('cat-' + cat);
+    if (section) section.classList.add('active');
+}
+
+// 滚动到推荐网站
+function scrollToSites() {
+    setTimeout(() => {
+        document.getElementById('mc-sites').scrollIntoView({ behavior: 'smooth' });
+    }, 100);
+}
+
+// 滚动到顶部
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// 回到顶部按钮显示控制
+window.addEventListener('scroll', () => {
+    const btn = document.getElementById('backToTop');
+    if (window.scrollY > 400) {
+        btn.classList.add('show');
+    } else {
+        btn.classList.remove('show');
+    }
+});
+
+// 搜索功能
+document.getElementById('searchInput').addEventListener('input', function(e) {
+    const query = e.target.value.toLowerCase().trim();
+    const cards = document.querySelectorAll('.resource-card');
+    const sections = document.querySelectorAll('.category-section');
+    
+    if (!query) {
+        cards.forEach(card => card.style.display = '');
+        return;
+    }
+    
+    sections.forEach(section => section.classList.add('active'));
+    
+    cards.forEach(card => {
+        const title = card.querySelector('.card-title').textContent.toLowerCase();
+        const desc = card.querySelector('.card-desc').textContent.toLowerCase();
+        if (title.includes(query) || desc.includes(query)) {
+            card.style.display = '';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+});
+
+// Ctrl+K 快捷键
+document.addEventListener('keydown', (e) => {
+    if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+        e.preventDefault();
+        const input = document.getElementById('searchInput');
+        if (input) input.focus();
+    }
+});
+
+// 生成漂浮粒子
+const particlesContainer = document.getElementById('particles');
+for (let i = 0; i < 25; i++) {
+    const particle = document.createElement('div');
+    particle.className = 'particle';
+    particle.style.left = Math.random() * 100 + '%';
+    particle.style.animationDuration = (Math.random() * 10 + 8) + 's';
+    particle.style.animationDelay = Math.random() * 10 + 's';
+    particle.style.width = (Math.random() * 6 + 3) + 'px';
+    particle.style.height = particle.style.width;
+    particlesContainer.appendChild(particle);
+}
+
+// 初始禁止滚动
+document.body.style.overflow = 'hidden';
+</script>
+</body>
+</html>
